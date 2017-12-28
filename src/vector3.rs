@@ -1,5 +1,6 @@
 use std::ops;
 
+#[derive(Debug)]
 pub struct Vector3 {
     pub x:f64,
     pub y:f64,
@@ -24,7 +25,7 @@ impl Vector3 {
             z: (self.x * v.y) - (self.y * v.x)
         }
     }
-    fn magnitude(&self) -> f64 {
+    pub fn magnitude(&self) -> f64 {
         return ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).sqrt();
     }
     pub fn normalize(&mut self) {
@@ -32,6 +33,14 @@ impl Vector3 {
         self.x *= l;
         self.y *= l;
         self.z *= l;
+    }
+}
+
+impl PartialEq for Vector3 {
+    fn eq(&self, other:&Vector3) -> bool {
+        return self.x == other.x
+            && self.y == other.y
+            && self.z == other.z;
     }
 }
 
@@ -65,13 +74,13 @@ impl ops::Mul<Vector3> for Vector3 {
         }
     }
 }
-/*impl ops::Mul<Vector3> for Vector3 {
+impl ops::Mul<f64> for Vector3 {
     type Output = Vector3;
-    fn mul(self, rhs:f64) {
+    fn mul(self, rhs:f64) -> Vector3 {
         return Vector3 {
             x: self.x * rhs,
             y: self.y * rhs,
             z: self.z * rhs
         }
     }
-}*/
+}
