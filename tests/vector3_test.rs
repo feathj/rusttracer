@@ -1,6 +1,6 @@
-extern crate rustcaster;
+extern crate rusttracer;
 
-use rustcaster::vector3::Vector3;
+use rusttracer::vector3::Vector3;
 
 #[test]
 fn dot_product_works() {
@@ -63,4 +63,3 @@ fn mul_scalar_works() {
 
     assert_eq!(res, Vector3::new(8.0, 10.0, 12.0));
 }
-

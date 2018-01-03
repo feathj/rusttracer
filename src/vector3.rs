@@ -38,9 +38,9 @@ impl Vector3 {
 
 impl PartialEq for Vector3 {
     fn eq(&self, other:&Vector3) -> bool {
-        return self.x == other.x
-            && self.y == other.y
-            && self.z == other.z;
+        return self.x.round() == other.x.round()
+            && self.y.round() == other.y.round()
+            && self.z.round() == other.z.round();
     }
 }
 
