@@ -1,6 +1,6 @@
 extern crate rusttracer;
 
-use rusttracer::color::Color;
+use rusttracer::base::color::Color;
 
 #[test]
 fn add_works() {

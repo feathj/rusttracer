@@ -1,5 +1,5 @@
-use color::Color;
-use vector3::Vector3;
+use base::color::Color;
+use base::vector3::Vector3;
 
 #[derive(Debug)]
 pub struct Light {

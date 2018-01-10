@@ -1,6 +1,6 @@
 extern crate rusttracer;
 
-use rusttracer::vector3::Vector3;
+use rusttracer::base::vector3::Vector3;
 
 #[test]
 fn dot_product_works() {

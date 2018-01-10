@@ -1,7 +1,7 @@
-use vector3::Vector3;
-use light::Light;
-use color::Color;
-use surface::Surface;
+use base::vector3::Vector3;
+use base::light::Light;
+use base::color::Color;
+use base::surface::Surface;
 
 use std::fmt::Debug;
 

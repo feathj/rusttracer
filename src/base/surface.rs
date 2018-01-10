@@ -1,4 +1,4 @@
-use color::Color;
+use base::color::Color;
 
 #[derive(Debug)]
 pub struct Surface {
