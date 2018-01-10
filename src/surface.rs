@@ -6,7 +6,7 @@ pub struct Surface {
     pub diffuse: Color,
     pub specular: Color,
     pub shiny: f64,
-    pub deflect: f64
+    pub reflect: f64
 }
 
 impl Surface {
