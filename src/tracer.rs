@@ -16,7 +16,8 @@ pub struct Ray {
 
 pub trait Primitive: Debug {
     fn intersect_ray(&self, ray: Ray) -> f64;
-    fn get_surface_normal(&self, p: Vector3) -> f64;
+    fn get_surface_normal(&self, p: Vector3) -> Vector3;
+    fn get_surface(&self) -> Surface;
 }
 
 #[derive(Debug)]
@@ -121,9 +122,9 @@ impl Tracer {
         };
     }
     fn cast_ray(&self, a_ray: Ray, a_rec_level: i32) -> Color {
-        let shortest_dist = f64::MAX;
-        let t:f64 = 0.0;
-        let np  = None;
+        let mut shortest_dist = f64::MAX;
+        let mut t:f64 = 0.0;
+        let mut np = None;
 
         for p in self.primitives {
             t = p.intersect_ray(a_ray);
@@ -140,7 +141,7 @@ impl Tracer {
             let n = nearest_prim.get_surface_normal(p);
             let v = a_ray.direction;
 
-            if(a_rec_level < TRACER_MAXREC){
+            if a_rec_level < TRACER_MAXREC {
                 // Reflection
                 let r = v - n * 2.0 * v.dot_product(n);
                 let reflection_ray = Ray {
@@ -148,12 +149,13 @@ impl Tracer {
                     direction: r
                 };
 
-                let orig_color = self.calculate_phong(p, n, v, nearest_prim.surface);
+                let orig_color = self.calculate_phong(p, n, v, nearest_prim.get_surface());
                 let ref_color = self.cast_ray(reflection_ray, a_rec_level + 1);
-                let interp_color = (orig_color * (1 - nearest_prim.surface.reflect)) + (ref_color * nearest_prim.surface.reflect);
-                return interpColor;
+                let interp_color = (orig_color * (1.0 - nearest_prim.get_surface().reflect)) + (ref_color * nearest_prim.get_surface().reflect);
+
+                return interp_color;
             } else {
-                return self.calculate_phong(p, n, v, nearest_prim.surface);
+                return self.calculate_phong(p, n, v, nearest_prim.get_surface());
             }
         }
         return self.world_color;
