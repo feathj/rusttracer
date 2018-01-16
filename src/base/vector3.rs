@@ -1,6 +1,6 @@
 use std::ops;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Vector3 {
     pub x:f64,
     pub y:f64,
@@ -44,6 +44,7 @@ impl PartialEq for Vector3 {
     }
 }
 
+// TODO: figure out how to make these ref based instead of cloning
 impl ops::Add<Vector3> for Vector3 {
     type Output = Vector3;
     fn add(self, rhs:Vector3) -> Vector3 {

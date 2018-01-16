@@ -1,9 +1,13 @@
-use base::vector3::Vector3;
-use base::light::Light;
-use base::color::Color;
-use base::surface::Surface;
+use base::Vector3;
+use base::Light;
+use base::Color;
+use base::Surface;
 
 use std::fmt::Debug;
+use std::f64;
+
+const TRACER_MAXREC:i32 = 3;
+const TRACER_EPSILON:f64 = 0.0001;
 
 pub struct Ray {
     pub eye: Vector3,
@@ -22,8 +26,8 @@ pub struct Tracer {
     camera_up: Vector3,
     camera_fov: f64,
 
-    width: f64,
-    height: f64,
+    width: i64,
+    height: i64,
 
     u: Vector3,
     v: Vector3,
@@ -39,8 +43,8 @@ pub struct Tracer {
 impl Tracer {
     // public
     pub fn new(
-        a_width: f64,
-        a_height: f64,
+        a_width: i64,
+        a_height: i64,
         a_camera_eye: Vector3,
         a_camera_look_at: Vector3
     ) -> Tracer{
@@ -88,18 +92,73 @@ impl Tracer {
     }
 
     // private
-    fn generate_ray(a_x: i64, a_y: i64) -> Ray {
-        // TODO
+    fn calc_vectors(&mut self) {
+        // calc u, v, w
+        self.w = self.camera_eye - self.camera_look_at;
+        self.w.normalize();
+
+        self.u = self.camera_up.cross_product(self.camera_eye - self.camera_look_at);
+        self.u.normalize();
+
+        self.v = self.w.cross_product(self.u);
+
+        // calc lu, lv
+        let view_length = self.camera_eye - self.camera_look_at;
+        self.lv = view_length.magnitude() * (self.camera_fov / 57.2958).sin();
+        self.lu = (self.width as f64 / self.height as f64) * self.lv;
+    }
+    fn generate_ray(&self, a_x: i64, a_y: i64) -> Ray {
+        let cu:f64 = (((2.0 * a_x as f64 + 1.0) / (2.0 * self.width as f64)) - 0.5) * self.lu;
+        let cv:f64 = (((2.0 * a_y as f64 + 1.0) / (2.0 * self.height as f64)) - 0.5) * self.lv;
+
+        let p = self.camera_look_at + (self.u * cu) + (self.v * cv);
+        let mut t = p - self.camera_eye;
+        t.normalize();
+
         return Ray {
-            eye: Vector3::new(0.0, 0.0, 0.0),
-            direction: Vector3::new(0.0, 0.0, 0.0)
+            eye: self.camera_eye,
+            direction: t
+        };
+    }
+    fn cast_ray(&self, a_ray: Ray, a_rec_level: i32) -> Color {
+        let shortest_dist = f64::MAX;
+        let t:f64 = 0.0;
+        let np  = None;
+
+        for p in self.primitives {
+            t = p.intersect_ray(a_ray);
+            if (t > 0.0) && t < shortest_dist {
+                shortest_dist = t;
+                np = Some(p);
+            }
         }
+
+        if np.is_some() && shortest_dist > 0.0 {
+            let nearest_prim = np.unwrap();
+            // Calculate components for phong model
+            let p = a_ray.eye + (a_ray.direction * shortest_dist);
+            let n = nearest_prim.get_surface_normal(p);
+            let v = a_ray.direction;
+
+            if(a_rec_level < TRACER_MAXREC){
+                // Reflection
+                let r = v - n * 2.0 * v.dot_product(n);
+                let reflection_ray = Ray {
+                    eye: p + r * TRACER_EPSILON,
+                    direction: r
+                };
+
+                let orig_color = self.calculate_phong(p, n, v, nearest_prim.surface);
+                let ref_color = self.cast_ray(reflection_ray, a_rec_level + 1);
+                let interp_color = (orig_color * (1 - nearest_prim.surface.reflect)) + (ref_color * nearest_prim.surface.reflect);
+                return interpColor;
+            } else {
+                return self.calculate_phong(p, n, v, nearest_prim.surface);
+            }
+        }
+        return self.world_color;
     }
-    fn cast_ray(a_ray: Ray, a_rec_level: i64) -> Color {
-        // TODO
-        return Color::new(0.0, 0.0, 0.0);
-    }
-    fn calculate_phong(a_p: Vector3, a_n: Vector3, a_v: Vector3, a_surface: Surface) -> Color {
+    fn calculate_phong(&self, a_p: Vector3, a_n: Vector3, a_v: Vector3, a_surface: Surface) -> Color {
         // TODO
         return Color::new(0.0, 0.0, 0.0);
     }
