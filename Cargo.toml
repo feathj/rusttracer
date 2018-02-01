@@ -3,4 +3,12 @@ name = "rusttracer"
 version = "0.1.0"
 authors = ["Jonathan Featherstone <jfeatherstone@instructure.com>"]
 
+[lib]
+name = "mylib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "mybin"
+path = "src/main.rs"
+
 [dependencies]

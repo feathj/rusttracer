@@ -1,6 +1,6 @@
 use base::color::Color;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Surface {
     pub ambient: Color,
     pub diffuse: Color,

@@ -2,23 +2,15 @@ use base::Vector3;
 use base::Light;
 use base::Color;
 use base::Surface;
+use base::Ray;
 
-use std::fmt::Debug;
+use primitives::Primitive;
+
+
 use std::f64;
 
 const TRACER_MAXREC:i32 = 3;
 const TRACER_EPSILON:f64 = 0.0001;
-
-pub struct Ray {
-    pub eye: Vector3,
-    pub direction: Vector3
-}
-
-pub trait Primitive: Debug {
-    fn intersect_ray(&self, ray: Ray) -> f64;
-    fn get_surface_normal(&self, p: Vector3) -> Vector3;
-    fn get_surface(&self) -> Surface;
-}
 
 #[derive(Debug)]
 pub struct Tracer {
@@ -49,7 +41,7 @@ impl Tracer {
         a_camera_eye: Vector3,
         a_camera_look_at: Vector3
     ) -> Tracer{
-        return Tracer {
+        let mut t = Tracer {
             camera_eye: a_camera_eye,
             camera_look_at: a_camera_look_at,
             camera_up: Vector3::new(0.0, 1.0, 0.0),
@@ -67,7 +59,9 @@ impl Tracer {
             primitives: Vec::new(),
             lights: Vec::new(),
             world_color: Color::new(0.0, 0.0, 0.0)
-        }
+        };
+        t.calc_vectors();
+        return t;
     }
     pub fn set_camera(&mut self, a_eye: Vector3, a_look_at: Vector3) {
         self.camera_eye = a_eye;
@@ -88,8 +82,15 @@ impl Tracer {
     pub fn clear_lights(&mut self) {
         self.lights.clear();
     }
-    pub fn trace(&self, on_calc_pixel: fn(x: f64, y: f64, color: Color)) {
-        // TODO
+    pub fn trace(&self, on_calc_pixel: fn(x: i64, y: i64, color: Color)) {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                let ray = self.generate_ray(x, y);
+                let color = self.cast_ray(ray, 0);
+
+                on_calc_pixel(x, y, color);
+            }
+        }
     }
 
     // private
@@ -123,10 +124,10 @@ impl Tracer {
     }
     fn cast_ray(&self, a_ray: Ray, a_rec_level: i32) -> Color {
         let mut shortest_dist = f64::MAX;
-        let mut t:f64 = 0.0;
+        let mut t:f64;
         let mut np = None;
 
-        for p in self.primitives {
+        for p in self.primitives.iter() {
             t = p.intersect_ray(a_ray);
             if (t > 0.0) && t < shortest_dist {
                 shortest_dist = t;
@@ -161,7 +162,28 @@ impl Tracer {
         return self.world_color;
     }
     fn calculate_phong(&self, a_p: Vector3, a_n: Vector3, a_v: Vector3, a_surface: Surface) -> Color {
-        // TODO
-        return Color::new(0.0, 0.0, 0.0);
+        // Sum ambient terms for lights for ia
+        let mut ia = Color::new(0.0, 0.0, 0.0);
+        for light in self.lights.iter() {
+            ia = ia + light.ambient;
+        }
+
+        // Apply phong model for each light
+        let mut sum_colors = Color::new(0.0, 0.0, 0.0);
+        for light in self.lights.iter() {
+            let mut l = a_p + light.position;
+            l.normalize();
+
+            let r = l - a_n * 2.0 * l.dot_product(a_n);
+            if l.dot_product(a_n) > 0.0 {
+                let diffuse = a_surface.diffuse * l.dot_product(a_n) * light.diffuse;
+                let specular = a_surface.specular * r.dot_product(a_v).powf(a_surface.shiny) * light.specular;
+
+                sum_colors = sum_colors + diffuse + specular;
+            }
+        }
+
+        // Apply ambient term
+        return ia + sum_colors;
     }
 }
