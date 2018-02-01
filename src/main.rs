@@ -1,18 +1,18 @@
-extern crate mylib;
+extern crate rtlib;
 
-use tracer::Tracer;
+use rtlib::tracer::Tracer;
 
-use base::Color;
-use base::Vector3;
+use rtlib::base::Color;
+use rtlib::base::Vector3;
 
-use primitives::Sphere;
+use rtlib::primitives::Sphere;
 
 pub fn main() {
-	let tracer = Tracer::new(1024, 768, Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -5.0));
+	let mut tracer = Tracer::new(1024, 768, Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -5.0));
 	tracer.set_world_color(Color::new(0.282, 0.475, 0.745));
 	
 	// Test sphere 1
-	let s1 = Sphere::new(Vector3::new(0.0, 1.0, -10.0), 2.0);
+	let mut s1 = Sphere::new(Vector3::new(0.0, 1.0, -10.0), 2.0);
 	// Chrome
 	s1.surface.ambient = Color::new(0.25, 0.25, 0.25);
 	s1.surface.diffuse = Color::new(0.4, 0.4, 0.4);
@@ -22,5 +22,6 @@ pub fn main() {
 
     tracer.add_primitive(Box::new(s1));
 
-    tracer.trace(on_calc_pixel);
+    // TODO
+    //tracer.trace(on_calc_pixel);
 }

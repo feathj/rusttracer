@@ -20,7 +20,6 @@ impl Sphere {
     }
 }
 
-
 impl Primitive for Sphere {
     fn intersect_ray(&self, ray: Ray) -> f64 {
         let a = (ray.direction.x * ray.direction.x) + (ray.direction.y * ray.direction.y) + (ray.direction.z * ray.direction.z);

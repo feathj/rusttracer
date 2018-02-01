@@ -6,7 +6,6 @@ use base::Ray;
 
 use primitives::Primitive;
 
-
 use std::f64;
 
 const TRACER_MAXREC:i32 = 3;

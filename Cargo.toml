@@ -4,11 +4,11 @@ version = "0.1.0"
 authors = ["Jonathan Featherstone <jfeatherstone@instructure.com>"]
 
 [lib]
-name = "mylib"
+name = "rtlib"
 path = "src/lib.rs"
 
 [[bin]]
-name = "mybin"
+name = "rtbin"
 path = "src/main.rs"
 
 [dependencies]
