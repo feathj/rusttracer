@@ -9,9 +9,19 @@ use rtlib::primitives::Sphere;
 
 use sdl2::gfx::primitives::DrawRenderer;
 use sdl2::pixels::Color as SColor;
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
 
-const SCREEN_WIDTH: u32 = 1024;
-const SCREEN_HEIGHT: u32 = 768;
+const SCREEN_WIDTH: u32 = 640;
+const SCREEN_HEIGHT: u32 = 480;
+
+fn convert_to_sdl_color(a_color:Color) -> SColor {
+    let r = (a_color.r * 255.0).round().min(255.0);
+    let g = (a_color.g * 255.0).round().min(255.0);
+    let b = (a_color.b * 255.0).round().min(255.0);
+
+    return SColor::RGB(r as u8, g as u8, b as u8);
+}
 
 fn main() {
     let mut tracer = Tracer::new(SCREEN_WIDTH as i64, SCREEN_HEIGHT as i64, Vector3::new(0.0, 0.0, 0.0), Vector3::new(0.0, 0.0, -5.0));
@@ -55,8 +65,6 @@ fn main() {
 	l1.specular = Color::new(1.0, 1.0, 1.0);
 	tracer.add_light(l1);
 
-    tracer.trace();
-
     let sdl_context = sdl2::init().unwrap();
     let video_subsys = sdl_context.video().unwrap();
     let window = video_subsys.window("rust-sdl2_gfx: draw line & FPSManager", SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -66,12 +74,43 @@ fn main() {
         .unwrap();
 
     let mut canvas = window.into_canvas().build().unwrap();
-    //let mut events = sdl_context.event_pump().unwrap();
+    let mut events = sdl_context.event_pump().unwrap();
 
     'main: loop {
-        for t in tracer.pixels.iter() {
-            let c = SColor::RGB((t.2.r * 255.0).round() as u8, (t.2.g * 255.0).round() as u8, (t.2.b * 255.0).round() as u8);
-            canvas.pixel(t.0 as i16, t.1 as i16, c).unwrap();
+        for event in events.poll_iter() {
+            match event {
+
+                Event::Quit {..} => break 'main,
+
+                Event::KeyDown {keycode: Some(keycode), ..} => {
+                    match keycode {
+                        Keycode::Escape => {
+                            break 'main;
+                        },
+                        Keycode::Up => {
+                            let mut eye = tracer.get_camera_eye();
+                            eye.y += 1.0;
+                            tracer.set_camera_eye(eye);
+                        }
+                        Keycode::Down => {
+                            let mut eye = tracer.get_camera_eye();
+                            eye.y -= 1.0;
+                            tracer.set_camera_eye(eye);
+                        }
+                        _ => {}
+                    }
+                },
+
+                Event::MouseButtonDown {x, y, ..} => {
+                    println!("mouse btn down at ({},{})", x, y);
+                },
+
+                _ => {}
+            }
+        }
+
+        for t in tracer.get_pixels().iter() {
+            canvas.pixel(t.0 as i16, (SCREEN_HEIGHT - t.1 as u32) as i16, convert_to_sdl_color(t.2)).unwrap();
         }
         canvas.present();
     }

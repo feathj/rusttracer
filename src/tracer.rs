@@ -31,7 +31,8 @@ pub struct Tracer {
     lights: Vec<Light>,
     world_color: Color,
 
-    pub pixels: Vec<(i64, i64, Color)>
+    changed: bool,
+    pixels: Vec<(i64, i64, Color)>
 
 }
 
@@ -62,31 +63,59 @@ impl Tracer {
             lights: Vec::new(),
             world_color: Color::new(0.0, 0.0, 0.0),
 
+            changed: false,
             pixels: Vec::<(i64, i64, Color)>::with_capacity((a_width * a_height) as usize)
         };
         t.calc_vectors();
         return t;
     }
-    pub fn set_camera(&mut self, a_eye: Vector3, a_look_at: Vector3) {
+    pub fn get_camera_eye(&self) -> Vector3 {
+        return self.camera_eye;
+    }
+    pub fn set_camera_eye(&mut self, a_eye: Vector3) {
+        self.changed = true;
         self.camera_eye = a_eye;
+    }
+    pub fn get_camera_look_at(&self) -> Vector3 {
+        return self.camera_look_at;
+    }
+    pub fn set_camera_look_at(&mut self, a_look_at: Vector3) {
+        self.changed = true;
         self.camera_look_at = a_look_at;
     }
+    pub fn get_world_color(&self) -> Color {
+        return self.world_color;
+    }
     pub fn set_world_color(&mut self, a_color: Color) {
+        self.changed = true;
         self.world_color = a_color;
     }
     pub fn add_primitive(&mut self, a_primitive: Box<Primitive>) {
+        self.changed = true;
         self.primitives.push(a_primitive);
     }
     pub fn clear_primitives(&mut self) {
+        self.changed = true;
         self.primitives.clear();
     }
     pub fn add_light(&mut self, a_light: Light) {
+        self.changed = true;
         self.lights.push(a_light);
     }
     pub fn clear_lights(&mut self) {
+        self.changed = true;
         self.lights.clear();
     }
-    pub fn trace(&mut self) {
+    pub fn get_pixels(&mut self) -> Vec<(i64, i64, Color)> {
+        if self.changed {
+            self.changed = false;
+            self.trace();
+        }
+        return self.pixels.to_owned();
+    }
+
+    // private
+    fn trace(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
                 let ray = self.generate_ray(x, y);
@@ -96,8 +125,6 @@ impl Tracer {
             }
         }
     }
-
-    // private
     fn calc_vectors(&mut self) {
         // calc u, v, w
         self.w = self.camera_eye - self.camera_look_at;
