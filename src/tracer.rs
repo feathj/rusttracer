@@ -30,6 +30,9 @@ pub struct Tracer {
     primitives: Vec<Box<Primitive>>,
     lights: Vec<Light>,
     world_color: Color,
+
+    pub pixels: Vec<(i64, i64, Color)>
+
 }
 
 impl Tracer {
@@ -57,7 +60,9 @@ impl Tracer {
 
             primitives: Vec::new(),
             lights: Vec::new(),
-            world_color: Color::new(0.0, 0.0, 0.0)
+            world_color: Color::new(0.0, 0.0, 0.0),
+
+            pixels: Vec::<(i64, i64, Color)>::with_capacity((a_width * a_height) as usize)
         };
         t.calc_vectors();
         return t;
@@ -81,13 +86,13 @@ impl Tracer {
     pub fn clear_lights(&mut self) {
         self.lights.clear();
     }
-    pub fn trace(&self, on_calc_pixel: fn(x: i64, y: i64, color: Color)) {
+    pub fn trace(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
                 let ray = self.generate_ray(x, y);
                 let color = self.cast_ray(ray, 0);
 
-                on_calc_pixel(x, y, color);
+                self.pixels.push((x, y, color));
             }
         }
     }
