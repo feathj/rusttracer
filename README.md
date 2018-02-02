@@ -6,7 +6,7 @@ I have no idea what I am doing in rust, so I ported my c++ raytracer so I could 
 
 Completely software rendered, but drawn to screen using SDL.
 
-![scene preview 1](https://raw.githubusercontent.com/feathj/rusttracer/master/images/preview1.png)
+![scene preview 1](https://github.com/feathj/rusttracer/blob/master/images/preview1.png)
 
 
 To build
