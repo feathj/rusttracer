@@ -4,6 +4,10 @@ A port of my c++ raytracer into rust (for cultural learnings for make benefit)
 
 I have no idea what I am doing in rust, so I ported my c++ raytracer so I could learn. This is a pet project so don't take it too seriously.
 
+Completely software rendered, but drawn to screen using SDL.
+
+![scene preview 1](https://raw.githubusercontent.com/feathj/rusttracer/master/images/preview1.png)
+
 
 To build
 ========
