@@ -106,12 +106,12 @@ impl Tracer {
         self.changed = true;
         self.lights.clear();
     }
-    pub fn get_pixels(&mut self) -> Vec<(i64, i64, Color)> {
+    pub fn get_pixels(&mut self) -> &Vec<(i64, i64, Color)> {
         if self.changed {
             self.changed = false;
             self.trace();
         }
-        return self.pixels.to_owned();
+        return &self.pixels;
     }
 
     // private

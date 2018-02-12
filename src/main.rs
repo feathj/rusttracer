@@ -6,14 +6,17 @@ use rtlib::base::Color;
 use rtlib::base::Light;
 use rtlib::base::Vector3;
 use rtlib::primitives::Sphere;
+use rtlib::primitives::Plane;
 
 use sdl2::gfx::primitives::DrawRenderer;
+//use sdl2::pixels::PixelFormatEnum;
+//use sdl2::rect::Rect;
 use sdl2::pixels::Color as SColor;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
-const SCREEN_WIDTH: u32 = 640;
-const SCREEN_HEIGHT: u32 = 480;
+const SCREEN_WIDTH: u32 = 800;
+const SCREEN_HEIGHT: u32 = 600;
 
 fn convert_to_sdl_color(a_color:Color) -> SColor {
     let r = (a_color.r * 255.0).round().min(255.0);
@@ -57,13 +60,29 @@ fn main() {
 	s3.surface.reflect = 0.0;
 	tracer.add_primitive(Box::new(s3));
 
+	// Test plane
+	let mut p1 = Plane::new(Vector3::new(0.0, -1.0, 0.0), Vector3::new(0.0, 1.0, 0.0));
+	// Black
+	p1.surface.ambient = Color::new(0.05375, 0.05, 0.06625);
+	p1.surface.diffuse = Color::new(0.18275, 0.17, 0.22525);
+	p1.surface.specular = Color::new(0.332741, 0.328634, 0.346435);
+	p1.surface.shiny = 86.0;
+	p1.surface.reflect = 0.3;
+	tracer.add_primitive(Box::new(p1));
 
-	// Test light 1
-	let mut l1 = Light::new(0.0, 10.0, 10.0);
-	l1.ambient = Color::new(0.1, 0.1, 0.1);
+    // Test light 1
+	let mut l1 = Light::new(-20.0, 10.0, 20.0);
+	l1.ambient = Color::new(0.001, 0.001, 0.001);
 	l1.diffuse = Color::new(1.0, 1.0, 1.0);
 	l1.specular = Color::new(1.0, 1.0, 1.0);
-	tracer.add_light(l1);
+    tracer.add_light(l1);
+
+    // Test light 2
+	let mut l2 = Light::new(20.0, 50.0, 20.0);
+	l2.ambient = Color::new(0.001, 0.001, 0.001);
+	l2.diffuse = Color::new(1.0, 1.0, 1.0);
+	l2.specular = Color::new(1.0, 1.0, 1.0);
+    tracer.add_light(l2);
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsys = sdl_context.video().unwrap();
@@ -89,13 +108,35 @@ fn main() {
                         },
                         Keycode::Up => {
                             let mut eye = tracer.get_camera_eye();
-                            eye.y += 1.0;
+                            eye.y += 0.25;
                             tracer.set_camera_eye(eye);
+                            let mut look_at = tracer.get_camera_look_at();
+                            look_at.y += 0.25;
+                            tracer.set_camera_look_at(look_at);
                         }
                         Keycode::Down => {
                             let mut eye = tracer.get_camera_eye();
-                            eye.y -= 1.0;
+                            eye.y -= 0.25;
                             tracer.set_camera_eye(eye);
+                            let mut look_at = tracer.get_camera_look_at();
+                            look_at.y -= 0.25;
+                            tracer.set_camera_look_at(look_at);
+                        }
+                        Keycode::Left => {
+                            let mut eye = tracer.get_camera_eye();
+                            eye.x -= 0.25;
+                            tracer.set_camera_eye(eye);
+                            let mut look_at = tracer.get_camera_look_at();
+                            look_at.x -= 0.25;
+                            tracer.set_camera_look_at(look_at);
+                        }
+                        Keycode::Right => {
+                            let mut eye = tracer.get_camera_eye();
+                            eye.x += 0.25;
+                            tracer.set_camera_eye(eye);
+                            let mut look_at = tracer.get_camera_look_at();
+                            look_at.x += 0.25;
+                            tracer.set_camera_look_at(look_at);
                         }
                         _ => {}
                     }

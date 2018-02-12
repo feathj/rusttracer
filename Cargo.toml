@@ -3,6 +3,9 @@ name = "rusttracer"
 version = "0.1.0"
 authors = ["Jonathan Featherstone <jfeatherstone@instructure.com>"]
 
+[profile.release]
+debug = true
+
 [lib]
 name = "rtlib"
 path = "src/lib.rs"

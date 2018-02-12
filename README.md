@@ -21,3 +21,6 @@ Add the following to your path:
 
 `cargo build`
 `cargo run`
+
+Profiling
+http://carol-nichols.com/2015/12/09/rust-profiling-on-osx-cpu-time/
