@@ -6,3 +6,6 @@ pub use self::sphere::Sphere;
 
 pub mod plane;
 pub use self::plane::Plane;
+
+pub mod triangle;
+pub use self::triangle::Triangle;

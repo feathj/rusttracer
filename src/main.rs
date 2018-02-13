@@ -7,6 +7,7 @@ use rtlib::base::Light;
 use rtlib::base::Vector3;
 use rtlib::primitives::Sphere;
 use rtlib::primitives::Plane;
+use rtlib::primitives::Triangle;
 
 use sdl2::gfx::primitives::DrawRenderer;
 //use sdl2::pixels::PixelFormatEnum;
@@ -22,8 +23,7 @@ fn convert_to_sdl_color(a_color:Color) -> SColor {
     let r = (a_color.r * 255.0).round().min(255.0);
     let g = (a_color.g * 255.0).round().min(255.0);
     let b = (a_color.b * 255.0).round().min(255.0);
-
-    return SColor::RGB(r as u8, g as u8, b as u8);
+return SColor::RGB(r as u8, g as u8, b as u8);
 }
 
 fn main() {
@@ -69,6 +69,19 @@ fn main() {
 	p1.surface.shiny = 86.0;
 	p1.surface.reflect = 0.3;
 	tracer.add_primitive(Box::new(p1));
+
+    // Test triangle
+    //let mut t1 = Triangle::new(
+        //Vector3::new(-5.0, 0.0, -10.0),
+        //Vector3::new(0.0, 10.0, -15.0),
+        //Vector3::new(5.0, 0.0, -10.0)
+        //);
+	//t1.surface.ambient = Color::new(0.25, 0.20725, 0.20725);
+	//t1.surface.diffuse = Color::new(1.0, 0.829, 0.829);
+	//t1.surface.specular = Color::new(0.296648, 0.296648, 0.296648);
+	//t1.surface.shiny = 86.0;
+	//t1.surface.reflect = 0.3;
+    //tracer.add_primitive(Box::new(t1));
 
     // Test light 1
 	let mut l1 = Light::new(-20.0, 10.0, 20.0);
